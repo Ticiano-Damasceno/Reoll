@@ -98,6 +98,10 @@ main {
   mask-image:radial-gradient(circle,#000 10%,transparent 66%)
 }
 
+.verde {
+  color:var(--cor-verde);
+}
+
 .eyebrow {
   color:var(--cor-texto-secundario);
   letter-spacing:.24em;
