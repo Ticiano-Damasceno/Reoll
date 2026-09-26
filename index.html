@@ -1,53 +1,71 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090a0a">
   <meta name="description" content="Arquivo de informações com acesso por senha.">
   <title>Reoll | Arquivo Restrito</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23090909'/%3E%3Cpath d='M32 7 57 50H7Z' fill='none' stroke='%23e8e8e5' stroke-width='4'/%3E%3Ccircle cx='32' cy='36' r='6' fill='%23e8e8e5'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23090909'/%3E%3Cpath d='M32 7 57 50H7Z' fill='none' stroke='%23e8e8e5' stroke-width='4'/%3E%3Ccircle cx='32' cy='36' r='6' fill='%23e8e8e5'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
- <div class="shell">
-  <header class="topbar"><div class="brand">ARQUIVO / 04</div><div class="topright">ACESSO RESTRITO&nbsp; ●</div></header>
-  <main id="main"><div class="ornament" aria-hidden="true"></div>
-   <div class="intro">
-     <p class="eyebrow">
-      <span class="traco">—</span>TRANSMISSÃO CONFIDENCIAL<span class="traco">—</span>
-     </p>
-     <h1 class="title">ARQUIVO<br>RESTRITO</h1>
-     <p class="subtitle">Informe a senha para acessar os registros.</p>
-   </div>
-   <form class="panel" id="gate" autocomplete="off"><label for="password">CÓDIGO DE ACESSO</label><input class="field" id="password" type="password" placeholder="Digite a senha" required aria-describedby="status" autocomplete="off"><button class="action" type="submit">ACESSAR ARQUIVO</button><p class="status" id="status" role="alert" hidden>ACESSO NEGADO · ALERTA DE INTRUSO</p></form>
-   <article class="archive" id="archive" aria-label="Conteúdo do arquivo">
-     <p class="eyebrow">— ACESSO AUTORIZADO —</p>
-     <h2 tabindex="-1">Informações do arquivo</h2>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">ARQUIVO / 04</div>
+      <div class="topright">ACESSO RESTRITO&nbsp; ●</div>
+    </header>
+    <main id="main">
+      <div class="ornament" aria-hidden="true"></div>
+      <div class="intro">
+        <p class="eyebrow">
+          <span class="traco" aria-hidden="true">
+            <span>—</span><span>—</span><span>—</span>
+          </span>
 
-     <!-- INÍCIO DO CONTEÚDO: edite os textos abaixo.
+          TRANSMISSÃO CONFIDENCIAL
+
+          <span class="traco" aria-hidden="true">
+            <span>—</span><span>—</span><span>—</span>
+          </span>
+        </p>
+      </div>
+      <form class="panel" id="gate" autocomplete="off"><label for="password">CÓDIGO DE ACESSO</label><input
+          class="field" id="password" type="password" placeholder="Digite a senha" required aria-describedby="status"
+          autocomplete="off"><button class="action" type="submit">ACESSAR ARQUIVO</button>
+        <p class="status" id="status" role="alert" hidden>ACESSO NEGADO · ALERTA DE INTRUSO</p>
+      </form>
+      <article class="archive" id="archive" aria-label="Conteúdo do arquivo">
+        <p class="eyebrow">— ACESSO AUTORIZADO —</p>
+        <h2 tabindex="-1">Informações do arquivo</h2>
+
+        <!-- INÍCIO DO CONTEÚDO: edite os textos abaixo.
           Para incluir uma nova seção, copie um bloco <div class="record">. -->
-     <div class="record">
-       <h3>01 / Apresentação</h3>
-       <p>Este espaço pode receber uma introdução ao seu projeto, grupo ou universo.</p>
-     </div>
+        <div class="record">
+          <h3>01 / Apresentação</h3>
+          <p>Este espaço pode receber uma introdução ao seu projeto, grupo ou universo.</p>
+        </div>
 
-     <div class="record">
-       <h3>02 / Informações</h3>
-       <p>Adicione aqui os dados e textos que deseja compartilhar com quem conhece a senha.</p>
-     </div>
+        <div class="record">
+          <h3>02 / Informações</h3>
+          <p>Adicione aqui os dados e textos que deseja compartilhar com quem conhece a senha.</p>
+        </div>
 
-     <div class="record">
-       <h3>03 / Contato</h3>
-       <p>Inclua um contato, link ou aviso final, se necessário.</p>
-     </div>
-     <!-- FIM DO CONTEÚDO -->
+        <div class="record">
+          <h3>03 / Contato</h3>
+          <p>Inclua um contato, link ou aviso final, se necessário.</p>
+        </div>
+        <!-- FIM DO CONTEÚDO -->
 
-     <button class="back" id="lock" type="button">ENCERRAR ACESSO</button>
-   </article>
-  </main>
-  <footer class="foot">REGISTRO CONFIDENCIAL // TRANSMISSÃO ENCERRADA</footer>
- </div>
- <script src="script.js" defer></script>
+        <button class="back" id="lock" type="button">ENCERRAR ACESSO</button>
+      </article>
+    </main>
+    <footer class="foot">REGISTRO CONFIDENCIAL // TRANSMISSÃO ENCERRADA</footer>
+  </div>
+  <script src="script.js" defer></script>
 </body>
+
 </html>
