@@ -13,8 +13,8 @@
   --cor-botao-hover: #b9c5be;
   --cor-borda: #89918d;
   --cor-conteudo: #c6d0ca;
-  --cor-destaque: #b794f6;
-  /* Roxo da transmissão confidencial. */
+  --cor-destaque: #b794f6; /* Roxo da transmissão confidencial. */
+  --cor-verde: #8fd6a3; /* Verde destaque */
   color-scheme:dark;
   font-family:'VT323', 'Courier New', monospace;
   background:var(--cor-fundo);
