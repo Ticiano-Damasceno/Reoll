@@ -98,8 +98,8 @@ main {
   mask-image:radial-gradient(circle,#000 10%,transparent 66%)
 }
 
-.verde {
-  color:var(--cor-verde);
+.intro .eyebrow .traco {
+  color: var(--cor-verde);
 }
 
 .eyebrow {
