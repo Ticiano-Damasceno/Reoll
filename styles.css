@@ -99,7 +99,29 @@ main {
 }
 
 .intro .eyebrow .traco {
-  color: var(--cor-verde);
+  display: inline-block;
+  color: #8fd6a3;
+  --movimento: 6px;
+  animation: apontar 0.8s ease-in-out infinite alternate;
+}
+
+.intro .eyebrow .traco:last-child {
+  --movimento: -6px;
+}
+
+@keyframes apontar {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--movimento));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro .eyebrow .traco {
+    animation: none;
+  }
 }
 
 .eyebrow {
