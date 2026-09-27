@@ -96,18 +96,54 @@ main {
   position: absolute;
   inset: 2% 5% 0;
   pointer-events: none;
-  opacity: .14;
-  background: radial-gradient(circle at center, transparent 0 13%, #b6c1bc 13.1% 13.3%, transparent 13.4% 23%, #b6c1bc 23.1% 23.3%, transparent 23.4%), linear-gradient(45deg, transparent 49.9%, #aeb9b4 50%, transparent 50.1%), linear-gradient(-45deg, transparent 49.9%, #aeb9b4 50%, transparent 50.1%);
-  mask-image: radial-gradient(circle, #000 10%, transparent 66%)
+  opacity: 0.18;
+
+  background:
+    /* Dois círculos concêntricos */
+    radial-gradient(circle at center,
+      transparent 0 13%,
+      #b6c1bc 13.1% 13.3%,
+      transparent 13.4% 23%,
+      #b6c1bc 23.1% 23.3%,
+      transparent 23.4%),
+
+    /* Primeira diagonal do X */
+    linear-gradient(45deg,
+      transparent 49.9%,
+      #aeb9b4 50%,
+      transparent 50.1%),
+
+    /* Segunda diagonal do X */
+    linear-gradient(-45deg,
+      transparent 49.9%,
+      #aeb9b4 50%,
+      transparent 50.1%);
+
+  /* Faz o desenho desaparecer suavemente nas bordas */
+  -webkit-mask-image: radial-gradient(circle, #000 10%, transparent 66%);
+  mask-image: radial-gradient(circle, #000 10%, transparent 66%);
+}
+
+.eyebrow {
+  color: var(--cor-texto-secundario);
+  letter-spacing: .24em;
+  font-size: 1.2rem;
+  margin: 0 0 18px;
+}
+
+.intro .eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  line-height: 1;
+  color: var(--cor-destaque);
 }
 
 .intro .eyebrow .traco {
   display: inline-flex;
   color: var(--cor-verde);
   letter-spacing: 0;
-  vertical-align: middle;
-
-  font-size: 1.3em;
   line-height: 1;
   transform: translateY(-2px);
 }
@@ -141,29 +177,29 @@ main {
   }
 }
 
-.intro .eyebrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  line-height: 1;
-}
-
-.eyebrow {
-  color: var(--cor-texto-secundario);
-  letter-spacing: .24em;
-  font-size: 19px;
-  margin: 0 0 18px
-}
-
 .title {
   position: relative;
+  margin: 0 0 18px;
+
+  font-family: inherit;
   font-size: clamp(48px, 7vw, 88px);
   font-weight: 400;
-  line-height: .95;
-  letter-spacing: .045em;
-  text-shadow: 2px 2px #585e5b;
-  margin: 0 0 18px
+  line-height: 0.95;
+  letter-spacing: 0.045em;
+  text-align: center;
+
+  /* Linhas horizontais nas letras, como uma tela antiga */
+  background: repeating-linear-gradient(to bottom,
+      #eeeeee 0px,
+      #eeeeee 3px,
+      #929793 3px,
+      #929793 5px);
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: none;
 }
 
 .subtitle {
@@ -272,69 +308,529 @@ main {
   letter-spacing: .1em
 }
 
+/* Janela central do chat */
 .archive {
   display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+
+  width: min(900px, calc(100vw - 32px));
+  height: min(560px, calc(100dvh - 32px));
+  margin: 0;
+  padding: 0;
+
+  grid-template-columns: 190px minmax(0, 1fr);
   text-align: left;
-  position: relative;
-  margin: 0 auto;
-  width: min(100%, 760px);
-  background: #080909e8;
-  border: 1px solid #87918b;
-  padding: clamp(25px, 5vw, 54px);
-  box-shadow: 0 20px 70px #000b
-}
+  overflow: hidden;
 
-.archive h2 {
-  font-size: 42px;
-  font-weight: 400;
-  margin: 0 0 20px;
-  border-bottom: 1px solid #5a645e;
-  padding-bottom: 16px
-}
+  background: var(--cor-fundo);
+  border: 2px solid var(--cor-borda);
+  border-radius: 0;
+  box-shadow:
+    6px 6px 0 #000,
+    0 0 30px #0008;
 
-.archive p {
-  font-size: 26px;
-  line-height: 1.25;
-  color: var(--cor-conteudo)
-}
-
-.archive .record {
-  border-left: 2px solid #a6b6aa;
-  padding-left: 22px;
-  margin: 28px 0
-}
-
-.archive h3 {
-  font-size: 29px;
-  margin: 0 0 6px;
-  font-weight: 400
-}
-
-.archive p {
-  margin: 0
-}
-
-.back {
-  background: none;
-  color: #dce6df;
-  border: 1px solid #89958c;
-  padding: 7px 20px;
-  font: inherit;
-  cursor: pointer;
-  margin-top: 22px
-}
-
-.back:hover {
-  background: #202a24
-}
-
-.unlocked .intro,
-.unlocked .panel {
-  display: none
+  transform: translate(-50%, -50%);
+  transform-origin: bottom right;
 }
 
 .unlocked .archive {
-  display: block
+  display: grid;
+  animation: abrir-chat 0.6s steps(6, end) both;
+}
+
+/* Cresce do canto inferior direito até o centro */
+@keyframes abrir-chat {
+  from {
+    transform:
+      translate(calc(50vw - 100% - 16px),
+        calc(50dvh - 100% - 16px)) scale(0.04);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Faixa esquerda */
+.chat-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px 16px;
+
+  background: #111313;
+  border-right: 1px solid var(--cor-borda);
+}
+
+.chat-label {
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+
+.archive .chat-sidebar h2 {
+  margin: 10px 0 0;
+  padding: 0;
+  border: 0;
+  color: var(--cor-destaque);
+  font-size: 28px;
+  overflow-wrap: anywhere;
+}
+
+.archive .chat-sidebar .back {
+  margin-top: auto;
+  padding: 8px;
+  font-size: 18px;
+}
+
+/* Área direita */
+.chat-conversation {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.chat-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cor-borda);
+  color: var(--cor-verde);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px;
+  scrollbar-color: var(--cor-borda) var(--cor-fundo);
+}
+
+.chat-message {
+  margin-bottom: 28px;
+  padding-left: 14px;
+  border-left: 2px solid var(--cor-destaque);
+}
+
+.chat-author {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--cor-verde);
+  font-size: 16px;
+  letter-spacing: 0.1em;
+}
+
+.archive .chat-message p {
+  margin: 0;
+  color: var(--cor-texto);
+  font-size: 24px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* Ajuste para celular */
+@media (max-width: 600px) {
+  .archive {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+
+  .chat-sidebar {
+    padding: 18px 10px;
+  }
+
+  .archive .chat-sidebar h2 {
+    font-size: 22px;
+  }
+
+  .chat-header,
+  .chat-messages {
+    padding: 16px;
+  }
+
+  .archive .chat-message p {
+    font-size: 20px;
+  }
+}
+
+/* Tela temporária de conexão */
+.conexao {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 20px;
+  background: var(--cor-fundo);
+  text-align: center;
+}
+
+.archive.conectando .conexao {
+  display: flex;
+}
+
+.archive.conectando .chat-sidebar,
+.archive.conectando .chat-conversation {
+  visibility: hidden;
+}
+
+.archive .conexao p {
+  margin: 0;
+  color: var(--cor-destaque);
+  font-size: 26px;
+}
+
+.conexao-diagrama {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.conexao-icone {
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: var(--cor-verde);
+  stroke-width: 2;
+}
+
+.conexao-pontos {
+  display: flex;
+  gap: 8px;
+  color: var(--cor-verde);
+  font-size: 16px;
+}
+
+.conexao-pontos span {
+  opacity: 0.15;
+  animation: conectar-ponto 1s steps(1, end) infinite;
+}
+
+.conexao-pontos span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.conexao-pontos span:nth-child(3) {
+  animation-delay: 0.30s;
+}
+
+.conexao-pontos span:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.conexao-pontos span:nth-child(5) {
+  animation-delay: 0.60s;
+}
+
+@keyframes conectar-ponto {
+
+  0%,
+  40%,
+  100% {
+    opacity: 0.15;
+  }
+
+  10%,
+  30% {
+    opacity: 1;
+  }
+}
+
+/* Destaque exclusivo da mensagem na tela inicial. */
+.intro .eyebrow {
+  color: var(--cor-destaque);
+}
+
+.tela-negada {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 24px;
+  background: var(--cor-fundo);
+  text-align: center;
+}
+
+.archive.negado {
+  border-color: var(--cor-erro);
+  box-shadow: 6px 6px 0 #000, 0 0 35px #ff646422;
+}
+
+.archive.negado .tela-negada {
+  display: flex;
+}
+
+.archive.negado .chat-sidebar,
+.archive.negado .chat-conversation {
+  visibility: hidden;
+}
+
+.archive .negado-titulo {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: clamp(42px, 8vw, 90px);
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.archive .tela-negada .back {
+  margin: 0;
+  color: var(--cor-erro);
+  border-color: var(--cor-erro);
+}
+
+.archive .intruso {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: clamp(28px, 5vw, 54px);
+  line-height: 1;
+  animation: piscar-intruso 1.6s steps(1, end) infinite;
+}
+
+@keyframes piscar-intruso {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.sidebar-toggle {
+  align-self: flex-end;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 16px;
+  padding: 0;
+
+  background: transparent;
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-verde);
+  font: inherit;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  background: #202a24;
+}
+
+/* Faixa recolhida: sobra apenas o botão. */
+.archive.lateral-minimizada {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+
+.archive.lateral-minimizada .chat-sidebar {
+  padding: 16px 8px;
+}
+
+.archive.lateral-minimizada .chat-sidebar> :not(.sidebar-toggle) {
+  display: none;
+}
+
+/* Rolagem das mensagens */
+.chat-conversation {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-header {
+  flex-shrink: 0;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-verde) #111313;
+}
+
+/* Personalização para navegadores compatíveis */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #111313;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: var(--cor-verde);
+  border: 2px solid #111313;
+}
+
+/* Camada visual do monitor */
+.efeitos-monitor {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Faixa luminosa atravessando a tela */
+.efeitos-monitor::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 100%;
+  height: 2px;
+
+  background: #a0a0a0;
+  opacity: 0.18;
+  box-shadow: none;
+  filter: none;
+
+  animation: varredura-monitor 9s linear infinite;
+}
+
+@keyframes varredura-monitor {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(100dvh + 2px));
+  }
+}
+
+.ruido-monitor {
+  position: absolute;
+  pointer-events: none;
+  image-rendering: pixelated;
+  mix-blend-mode: screen;
+
+  background: none;
+  box-shadow: none;
+
+  animation: tremida-ruido 0.3s steps(1, end) infinite;
+}
+
+@keyframes tremida-ruido {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(-5px, 1px); }
+  50%      { transform: translate(7px, -1px); }
+  75%      { transform: translate(-3px, 2px); }
+}
+
+@keyframes chiado-monitor {
+  0% {
+    opacity: 0.55;
+    transform: translate(-6px, 0);
+    background-position: 0 0, 0 0, 0 0;
+  }
+
+  15% {
+    opacity: 0.7;
+    transform: translate(7px, -2px) skewX(8deg);
+    background-position: 0 12px, -15px 0, 0 -8px;
+  }
+
+  30% {
+    opacity: 0.6;
+    transform: translate(-8px, 2px);
+    background-position: 0 -9px, 12px 0, 0 16px;
+  }
+
+  45% {
+    opacity: 0.75;
+    transform: translate(5px, 0) skewX(-8deg);
+    background-position: 0 18px, -8px 0, 0 -12px;
+  }
+
+  60% {
+    opacity: 0.55;
+    transform: translate(-4px, -2px);
+    background-position: 0 -14px, 20px 0, 0 7px;
+  }
+
+  75% {
+    opacity: 0.7;
+    transform: translate(8px, 2px) skewX(5deg);
+    background-position: 0 6px, -18px 0, 0 -17px;
+  }
+
+  90% {
+    opacity: 0.5;
+    transform: translate(-5px, 0);
+    background-position: 0 -18px, 9px 0, 0 12px;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+}
+
+/* Move o degradê de fundo. */
+body.interferencia-forte {
+  background-size: calc(100% + 24px) calc(100% + 12px);
+  animation:
+    deslocar-fundo var(--duracao-chiado, 1200ms)
+    steps(1, end) both;
+}
+
+/* Move também os círculos, o X e a sombra das bordas. */
+body.interferencia-forte .ornament,
+body.interferencia-forte::after {
+  animation:
+    tremer-fundo var(--duracao-chiado, 1200ms)
+    steps(1, end) both;
+}
+
+@keyframes deslocar-fundo {
+  0%, 100% { background-position: 0 0; }
+  20%      { background-position: -16px -4px; }
+  40%      { background-position: -2px -10px; }
+  60%      { background-position: -20px -2px; }
+  80%      { background-position: -6px -8px; }
+}
+
+@keyframes tremer-fundo {
+  0%, 100% { transform: translate(0, 0); }
+  20%      { transform: translate(-7px, 2px); }
+  40%      { transform: translate(6px, -2px); }
+  60%      { transform: translate(-5px, 1px); }
+  80%      { transform: translate(8px, -1px); }
+}
+
+/* Atrás do conteúdo, que está na camada 2. */
+.ruidos-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Mais transparência e movimentos menores. */
+.ruido-monitor {
+  opacity: 0.35;
+}
+
+@keyframes tremida-ruido {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(-1px, 1px); }
+  50%      { transform: translate(2px, -1px); }
+  75%      { transform: translate(-1px, 0); }
 }
 
 @media(max-width:600px) {
@@ -373,9 +869,4 @@ main {
       opacity: .3
     }
   }
-}
-
-/* Destaque exclusivo da mensagem na tela inicial. */
-.intro .eyebrow {
-  color: var(--cor-destaque);
 }

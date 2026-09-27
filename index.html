@@ -25,46 +25,101 @@
           <span class="traco" aria-hidden="true">
             <span>—</span><span>—</span><span>—</span>
           </span>
-
           TRANSMISSÃO CONFIDENCIAL
-
           <span class="traco" aria-hidden="true">
             <span>—</span><span>—</span><span>—</span>
           </span>
         </p>
+        <h1 class="title">ARQUIVO<br>RESTRITO</h1>
       </div>
       <form class="panel" id="gate" autocomplete="off"><label for="password">CÓDIGO DE ACESSO</label><input
           class="field" id="password" type="password" placeholder="Digite a senha" required aria-describedby="status"
           autocomplete="off"><button class="action" type="submit">ACESSAR ARQUIVO</button>
         <p class="status" id="status" role="alert" hidden>ACESSO NEGADO · ALERTA DE INTRUSO</p>
       </form>
-      <article class="archive" id="archive" aria-label="Conteúdo do arquivo">
-        <p class="eyebrow">— ACESSO AUTORIZADO —</p>
-        <h2 tabindex="-1">Informações do arquivo</h2>
+      <article class="archive" id="archive" aria-label="Chat do arquivo">
 
-        <!-- INÍCIO DO CONTEÚDO: edite os textos abaixo.
-          Para incluir uma nova seção, copie um bloco <div class="record">. -->
-        <div class="record">
-          <h3>01 / Apresentação</h3>
-          <p>Este espaço pode receber uma introdução ao seu projeto, grupo ou universo.</p>
+        <div class="conexao" role="status" tabindex="-1">
+          <div class="conexao-diagrama" aria-hidden="true">
+            <!-- Usuário -->
+            <svg viewBox="0 0 32 32" class="conexao-icone">
+              <circle cx="16" cy="9" r="5" />
+              <path d="M5 28v-4a11 11 0 0 1 22 0v4Z" />
+            </svg>
+
+            <div class="conexao-pontos">
+              <span>■</span>
+              <span>■</span>
+              <span>■</span>
+              <span>■</span>
+              <span>■</span>
+            </div>
+
+            <!-- Servidor -->
+            <svg viewBox="0 0 32 32" class="conexao-icone">
+              <rect x="5" y="3" width="22" height="26" />
+              <path d="M5 12h22M5 21h22M9 8h3M9 17h3M9 25h3" />
+            </svg>
+          </div>
+
+          <p>Estabelecendo conexão...</p>
         </div>
 
-        <div class="record">
-          <h3>02 / Informações</h3>
-          <p>Adicione aqui os dados e textos que deseja compartilhar com quem conhece a senha.</p>
+        <div class="tela-negada" role="alert">
+          <p class="negado-titulo" id="negado-titulo" tabindex="-1">
+            ACESSO NEGADO
+          </p>
+
+          <p class="intruso" id="alerta-intruso" hidden>
+            ALERTA DE INTRUSO
+          </p>
         </div>
 
-        <div class="record">
-          <h3>03 / Contato</h3>
-          <p>Inclua um contato, link ou aviso final, se necessário.</p>
-        </div>
-        <!-- FIM DO CONTEÚDO -->
+        <!-- Faixa esquerda -->
+        <aside class="chat-sidebar">
+          <button class="sidebar-toggle" id="toggle-sidebar" type="button" aria-label="Recolher faixa lateral"
+            aria-expanded="true">
+            «
+          </button>
+          <span class="chat-label">ARQUIVO ABERTO</span>
+          <h2 tabindex="-1">REOLL.txt</h2>
 
-        <button class="back" id="lock" type="button">ENCERRAR ACESSO</button>
+          <button class="back" id="lock" type="button">
+            SAIR
+          </button>
+        </aside>
+
+        <!-- Área das mensagens -->
+        <section class="chat-conversation" aria-label="Mensagens">
+          <header class="chat-header">
+            TRANSMISSÃO ESTABELECIDA
+          </header>
+
+          <div class="chat-messages">
+            <!-- Copie um bloco chat-message para adicionar mensagens -->
+            <div class="chat-message">
+              <span class="chat-author">SISTEMA</span>
+              <p>Acesso autorizado. Arquivo carregado.</p>
+            </div>
+
+            <div class="chat-message">
+              <span class="chat-author">REOLL</span>
+              <p>Estávamos esperando por você.</p>
+            </div>
+
+            <div class="chat-message">
+              <span class="chat-author">REOLL</span>
+              <p>Adicione aqui o conteúdo da sua próxima mensagem.</p>
+            </div>
+          </div>
+        </section>
+
       </article>
     </main>
     <footer class="foot">REGISTRO CONFIDENCIAL // TRANSMISSÃO ENCERRADA</footer>
   </div>
+  <div class="efeitos-monitor" aria-hidden="true"></div>
+  <div class="ruidos-fundo" aria-hidden="true"></div>
   <script src="script.js" defer></script>
 </body>
 
