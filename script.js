@@ -203,7 +203,7 @@ function criarInterferencia() {
 
       ruidosFundo.appendChild(ruido);
       desenharRuido(ruido);
-      
+
       // Distribui os chiados em regiões diferentes da tela.
       const alturaRegiao = alturaTela / quantidade;
       const posicao = alturaRegiao * (i + 0.2 + Math.random() * 0.6);
@@ -235,3 +235,27 @@ function criarInterferencia() {
 if (efeitosMonitor) {
   criarInterferencia();
 }
+
+const botaoExpandir = document.getElementById('toggle-expandir');
+
+
+function definirTelaCheia(ativa) {
+  archive.style.animation = 'none';
+  archive.classList.toggle('tela-cheia', ativa);
+
+  botaoExpandir.textContent = ativa ? '❐' : '⛶';
+
+  const descricao = ativa
+    ? 'Restaurar tamanho'
+    : 'Expandir chat';
+
+  botaoExpandir.setAttribute('aria-label', descricao);
+  botaoExpandir.setAttribute('aria-pressed', String(ativa));
+  botaoExpandir.title = descricao;
+}
+
+botaoExpandir.addEventListener('click', () => {
+  definirTelaCheia(
+    !archive.classList.contains('tela-cheia')
+  );
+});
