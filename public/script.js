@@ -1,7 +1,6 @@
 // SENHA DE ACESSO: altere o valor de ACCESS_CODE abaixo.
 // Os textos da página ficam no index.html.
 
-const ACCESS_CODE = 'elementos'; // Troque pela senha desejada. Em site estático, ela é visível no código-fonte.
 const gate = document.getElementById('gate');
 const password = document.getElementById('password');
 const statusMessage = document.getElementById('status');
@@ -24,6 +23,9 @@ function fecharJanela() {
   archive.classList.remove('conectando', 'negado');
   archive.setAttribute('aria-busy', 'false');
 
+  document.querySelector('.chat-messages').replaceChildren();
+  alertaIntruso.hidden = true;
+
   definirLateral(false);
   statusMessage.hidden = true;
   password.value = '';
@@ -31,47 +33,77 @@ function fecharJanela() {
   alertaIntruso.hidden = true;
 }
 
-gate.addEventListener('submit', event => {
+gate.addEventListener('submit', async event => {
   event.preventDefault();
+
+  // Evita iniciar outra solicitação enquanto a janela está aberta.
+  if (document.body.classList.contains('unlocked')) return;
+
   limparTemporizadores();
 
-  const senhaCorreta = password.value === ACCESS_CODE;
+  const senhaDigitada = password.value;
+  const inicio = performance.now();
 
-  // Abre a mesma janela e mostra a conexão.
+  password.value = '';
+  statusMessage.hidden = true;
+  alertaIntruso.hidden = true;
+
+  document.querySelector('.chat-messages').replaceChildren();
+
   archive.classList.remove('negado');
   archive.classList.add('conectando');
   archive.setAttribute('aria-busy', 'true');
 
-  statusMessage.hidden = true;
-  password.value = '';
-
   document.body.classList.add('unlocked');
   archive.querySelector('.conexao').focus();
 
-  tempoConexao = setTimeout(() => {
-    if (senhaCorreta) {
-      archive.classList.remove('conectando');
-      archive.setAttribute('aria-busy', 'false');
-      archive.querySelector('.chat-sidebar h2').focus();
-      return;
+  try {
+    const resposta = await fetch('/api/conteudo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store',
+      body: JSON.stringify({ senha: senhaDigitada })
+    });
+
+    if (!resposta.ok && resposta.status !== 401) {
+      throw new Error('Falha ao consultar o servidor');
     }
 
-    // Senha incorreta: primeiro aviso.
-    negadoTitulo.textContent = 'ACESSO NEGADO';
-    archive.classList.add('negado');
-    archive.classList.remove('conectando');
-    archive.setAttribute('aria-busy', 'false');
-    negadoTitulo.focus();
+    const dados = resposta.ok ? await resposta.json() : null;
 
-    // Segundo aviso.
-    tempoAlerta = setTimeout(() => {
-      alertaIntruso.hidden = false;
+    // Mantém a animação de conexão por pelo menos 2,8 segundos.
+    const espera = Math.max(0, 2800 - (performance.now() - inicio));
 
-      // 1,2 segundo de espera + 2,8 segundos de alerta = 4 segundos.
-      tempoAlerta = setTimeout(fecharJanela, 2800);
-    }, 1200);
+    tempoConexao = setTimeout(() => {
+      archive.classList.remove('conectando');
+      archive.setAttribute('aria-busy', 'false');
 
-  }, 2800);
+      if (resposta.ok) {
+        mostrarMensagens(dados.mensagens);
+        archive.querySelector('.chat-sidebar h2').focus();
+        return;
+      }
+
+      negadoTitulo.textContent = 'ACESSO NEGADO';
+      archive.classList.add('negado');
+      negadoTitulo.focus();
+
+      tempoAlerta = setTimeout(() => {
+        alertaIntruso.hidden = false;
+        tempoAlerta = setTimeout(fecharJanela, 2800);
+      }, 1200);
+    }, espera);
+
+  } catch {
+    fecharJanela();
+
+    statusMessage.textContent =
+      'FALHA NA CONEXÃO. TENTE NOVAMENTE.';
+
+    statusMessage.hidden = false;
+  }
 });
 
 document.getElementById('lock').addEventListener('click', fecharJanela);
@@ -238,7 +270,6 @@ if (efeitosMonitor) {
 
 const botaoExpandir = document.getElementById('toggle-expandir');
 
-
 function definirTelaCheia(ativa) {
   archive.style.animation = 'none';
   archive.classList.toggle('tela-cheia', ativa);
@@ -259,3 +290,25 @@ botaoExpandir.addEventListener('click', () => {
     !archive.classList.contains('tela-cheia')
   );
 });
+
+function mostrarMensagens(mensagens) {
+  const area = document.querySelector('.chat-messages');
+  area.replaceChildren();
+
+  for (const mensagem of mensagens) {
+    const bloco = document.createElement('div');
+    bloco.className = 'chat-message';
+
+    const autor = document.createElement('span');
+    autor.className = 'chat-author';
+    autor.textContent = mensagem.autor;
+
+    const texto = document.createElement('p');
+    texto.textContent = mensagem.texto;
+
+    bloco.append(autor, texto);
+    area.appendChild(bloco);
+  }
+
+  area.scrollTop = 0;
+}
