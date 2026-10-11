@@ -6,14 +6,15 @@ const password = document.getElementById('password');
 const statusMessage = document.getElementById('status');
 const archive = document.getElementById('archive');
 const negadoTitulo = document.getElementById('negado-titulo');
-const alertaIntruso = document.getElementById('alerta-intruso');
 
+let tempoMensagem;
 let tempoConexao;
 let tempoAlerta;
 
 function limparTemporizadores() {
   clearTimeout(tempoConexao);
   clearTimeout(tempoAlerta);
+  clear(tempoMensagem)
 }
 
 function fecharJanela() {
@@ -86,14 +87,7 @@ gate.addEventListener('submit', async event => {
         return;
       }
 
-      negadoTitulo.textContent = 'ACESSO NEGADO';
-      archive.classList.add('negado');
-      negadoTitulo.focus();
-
-      tempoAlerta = setTimeout(() => {
-        alertaIntruso.hidden = false;
-        tempoAlerta = setTimeout(fecharJanela, 2800);
-      }, 1200);
+      tempoAlerta = setTimeout(fecharJanela, 4000);
     }, espera);
 
   } catch {
@@ -292,23 +286,50 @@ botaoExpandir.addEventListener('click', () => {
 });
 
 function mostrarMensagens(mensagens) {
+  clearTimeout(tempoMensagem);
+
   const area = document.querySelector('.chat-messages');
   area.replaceChildren();
+  area.scrollTop = 0;
 
-  for (const mensagem of mensagens) {
-    const bloco = document.createElement('div');
-    bloco.className = 'chat-message';
+  let indice = 0;
 
-    const autor = document.createElement('span');
-    autor.className = 'chat-author';
-    autor.textContent = mensagem.autor;
+  function agendarMensagem() {
+    if (indice >= mensagens.length) return;
 
-    const texto = document.createElement('p');
-    texto.textContent = mensagem.texto;
+    // Intervalo aleatório entre 200 e 600 milissegundos.
+    const intervalo = 200 + Math.random() * 400;
 
-    bloco.append(autor, texto);
-    area.appendChild(bloco);
+    tempoMensagem = setTimeout(() => {
+      if (!document.body.classList.contains('unlocked')) return;
+
+      const mensagem = mensagens[indice];
+
+      // Só acompanha a mensagem se o usuário estiver perto do fim.
+      const acompanhar =
+        area.scrollHeight - area.scrollTop - area.clientHeight < 60;
+
+      const bloco = document.createElement('div');
+      bloco.className = 'chat-message';
+
+      const autor = document.createElement('span');
+      autor.className = 'chat-author';
+      autor.textContent = mensagem.autor;
+
+      const texto = document.createElement('p');
+      texto.textContent = mensagem.texto;
+
+      bloco.append(autor, texto);
+      area.appendChild(bloco);
+
+      if (acompanhar) {
+        area.scrollTop = area.scrollHeight;
+      }
+
+      indice++;
+      agendarMensagem();
+    }, intervalo);
   }
 
-  area.scrollTop = 0;
+  agendarMensagem();
 }

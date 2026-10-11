@@ -587,24 +587,11 @@ main {
   border-color: var(--cor-erro);
 }
 
-.archive .intruso {
+.archive {
   margin: 0;
   color: var(--cor-erro);
   font-size: clamp(28px, 5vw, 54px);
   line-height: 1;
-  animation: piscar-intruso 1.6s steps(1, end) infinite;
-}
-
-@keyframes piscar-intruso {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.15;
-  }
 }
 
 .sidebar-toggle {
@@ -934,6 +921,26 @@ body.interferencia-forte::after {
   font-family: Arial, sans-serif;
   font-size: 24px;
   line-height: 1;
+}
+
+.chat-message {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+
+  /* Move o detalhe roxo para acompanhar o alinhamento. */
+  border-left: 0;
+  border-right: 2px solid var(--cor-destaque);
+  padding-left: 0;
+  padding-right: 14px;
+
+  overflow-wrap: anywhere;
+}
+
+.chat-author {
+  display: block;
 }
 
 @media(max-width:600px) {
