@@ -1,6 +1,3 @@
-// SENHA DE ACESSO: altere o valor de ACCESS_CODE abaixo.
-// Os textos da página ficam no index.html.
-
 const gate = document.getElementById('gate');
 const password = document.getElementById('password');
 const statusMessage = document.getElementById('status');
@@ -14,7 +11,7 @@ let tempoAlerta;
 function limparTemporizadores() {
   clearTimeout(tempoConexao);
   clearTimeout(tempoAlerta);
-  clear(tempoMensagem)
+  clearTimeout(tempoMensagem);
 }
 
 function fecharJanela() {
@@ -25,13 +22,14 @@ function fecharJanela() {
   archive.setAttribute('aria-busy', 'false');
 
   document.querySelector('.chat-messages').replaceChildren();
-  alertaIntruso.hidden = true;
 
   definirLateral(false);
+  definirTelaCheia(false);
+  archive.style.removeProperty('animation');
+
   statusMessage.hidden = true;
   password.value = '';
   password.focus();
-  alertaIntruso.hidden = true;
 }
 
 gate.addEventListener('submit', async event => {
@@ -47,7 +45,6 @@ gate.addEventListener('submit', async event => {
 
   password.value = '';
   statusMessage.hidden = true;
-  alertaIntruso.hidden = true;
 
   document.querySelector('.chat-messages').replaceChildren();
 
@@ -87,6 +84,10 @@ gate.addEventListener('submit', async event => {
         return;
       }
 
+      negadoTitulo.textContent = 'ACESSO NEGADO';
+      archive.classList.add('negado');
+      negadoTitulo.focus();
+
       tempoAlerta = setTimeout(fecharJanela, 4000);
     }, espera);
 
@@ -121,7 +122,6 @@ botaoLateral.addEventListener('click', () => {
   );
 });
 
-const efeitosMonitor = document.querySelector('.efeitos-monitor');
 const ruidosFundo = document.querySelector('.ruidos-fundo');
 
 function desenharRuido(canvas) {
@@ -185,27 +185,6 @@ function criarInterferencia() {
       ruido.className = 'ruido-monitor';
       ruido.setAttribute('aria-hidden', 'true');
 
-      // const largura = Math.min(
-      //   efeitosMonitor.clientWidth,
-      //   150 + Math.random() * 250
-      // );
-
-      // const altura = 30 + Math.random() * 50;
-
-      // // Resolução reduzida para criar pixels maiores.
-      // ruido.width = Math.ceil(largura / 2);
-      // ruido.height = Math.ceil(altura / 2);
-
-      // ruido.style.width = `${largura}px`;
-      // ruido.style.height = `${altura}px`;
-
-      // ruido.style.left = `${Math.random() * Math.max(0, efeitosMonitor.clientWidth - largura)
-      //   }px`;
-
-      // ruido.style.top = `${Math.random() * Math.max(0, efeitosMonitor.clientHeight - altura)
-      //   }px`;
-
-
       const larguraTela = ruidosFundo.clientWidth;
       const alturaTela = ruidosFundo.clientHeight;
 
@@ -258,7 +237,7 @@ function criarInterferencia() {
   );
 }
 
-if (efeitosMonitor) {
+if (ruidosFundo) {
   criarInterferencia();
 }
 
