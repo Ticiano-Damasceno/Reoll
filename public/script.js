@@ -329,25 +329,10 @@ function mostrarMensagens(mensagens) {
 }
 
 function mostrarArquivos(arquivos) {
+  limparAreaChat();
   listaArquivos.replaceChildren();
-  fecharBusca();
 
-  // Mantenha o restante desta função.
-
-  function selecionarArquivo(arquivo, botaoSelecionado) {
-    for (const botao of listaArquivos.children) {
-      const selecionado = botao === botaoSelecionado;
-
-      botao.classList.toggle('ativo', selecionado);
-      botao.setAttribute('aria-pressed', String(selecionado));
-    }
-
-    arquivoAtual.textContent = arquivo.nome;
-
-    mostrarMensagens(arquivo.mensagens);
-  }
-
-  arquivos.forEach((arquivo, indice) => {
+  for (const arquivo of arquivos) {
     const botao = document.createElement('button');
 
     botao.type = 'button';
@@ -357,17 +342,23 @@ function mostrarArquivos(arquivos) {
     botao.setAttribute('aria-pressed', 'false');
 
     botao.addEventListener('click', () => {
-      if (botao.classList.contains('ativo')) return;
+      // Verifica antes de limpar a seleção.
+      const jaEstavaAberto = botao.classList.contains('ativo');
 
-      selecionarArquivo(arquivo, botao);
+      limparAreaChat();
+
+      // Clicar novamente no mesmo arquivo apenas o fecha.
+      if (jaEstavaAberto) return;
+
+      botao.classList.add('ativo');
+      botao.setAttribute('aria-pressed', 'true');
+
+      arquivoAtual.textContent = arquivo.nome;
+      mostrarMensagens(arquivo.mensagens);
     });
 
     listaArquivos.appendChild(botao);
-
-    if (indice === 0) {
-      selecionarArquivo(arquivo, botao);
-    }
-  });
+  }
 }
 
 const botaoConsulta = document.getElementById('abrir-consulta');
@@ -390,14 +381,18 @@ function fecharBusca() {
   buscaController?.abort();
   buscaController = null;
 
-  painelBusca.classList.remove('consultando', 'exibindo-resultado');
+  painelBusca.classList.remove(
+    'consultando',
+    'exibindo-resultado'
+  );
+
+  painelBusca.hidden = true;
+  painelBusca.setAttribute('aria-busy', 'false');
 
   animacaoConsulta.hidden = true;
   terminalLinhas.replaceChildren();
   progressoConsulta.value = 0;
 
-  painelBusca.hidden = true;
-  painelBusca.setAttribute('aria-busy', 'false');
   areaMensagens.hidden = false;
 
   botaoConsulta.setAttribute('aria-pressed', 'false');
@@ -707,4 +702,19 @@ function mostrarAvisoConsulta(mensagem) {
 
   aviso.appendChild(texto);
   abrirResultado(aviso);
+}
+
+function limparAreaChat() {
+  // Interrompe a sequência de mensagens e qualquer busca.
+  clearTimeout(tempoMensagem);
+  fecharBusca();
+
+  areaMensagens.replaceChildren();
+  areaMensagens.scrollTop = 0;
+  arquivoAtual.textContent = '';
+
+  for (const botao of listaArquivos.children) {
+    botao.classList.remove('ativo');
+    botao.setAttribute('aria-pressed', 'false');
+  }
 }
