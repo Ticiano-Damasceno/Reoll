@@ -41,23 +41,34 @@ export default function handler(req, res) {
   }
 
   try {
-    const mensagens = JSON.parse(conteudo);
+    const dados = JSON.parse(conteudo);
 
     const valido =
-      Array.isArray(mensagens) &&
-      mensagens.every(
-        mensagem =>
-          mensagem &&
+      dados !== null &&
+      Array.isArray(dados.arquivos) &&
+      dados.arquivos.length > 0 &&
+      dados.arquivos.every(arquivo =>
+        arquivo !== null &&
+        typeof arquivo.nome === 'string' &&
+        arquivo.nome.trim().length > 0 &&
+        Array.isArray(arquivo.mensagens) &&
+        arquivo.mensagens.every(mensagem =>
+          mensagem !== null &&
           typeof mensagem.autor === 'string' &&
           typeof mensagem.texto === 'string'
+        )
       );
 
     if (!valido) {
       throw new Error('Conteúdo inválido');
     }
 
-    return res.status(200).json({ mensagens });
+    return res.status(200).json({
+      arquivos: dados.arquivos
+    });
   } catch {
-    return res.status(500).json({ erro: 'Serviço indisponível.' });
+    return res.status(500).json({
+      erro: 'Serviço indisponível.'
+    });
   }
 }
