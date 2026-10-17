@@ -390,6 +390,12 @@ function fecharBusca() {
   buscaController?.abort();
   buscaController = null;
 
+  painelBusca.classList.remove('consultando', 'exibindo-resultado');
+
+  animacaoConsulta.hidden = true;
+  terminalLinhas.replaceChildren();
+  progressoConsulta.value = 0;
+
   painelBusca.hidden = true;
   painelBusca.setAttribute('aria-busy', 'false');
   areaMensagens.hidden = false;
@@ -471,7 +477,7 @@ function mostrarFicha(personagem) {
   }
 
   ficha.append(imagem, avisoFoto, titulo, dados);
-  resultadoPersonagem.replaceChildren(ficha);
+  abrirResultado(ficha);
 }
 
 formPersonagem.addEventListener('submit', async event => {
@@ -493,11 +499,18 @@ formPersonagem.addEventListener('submit', async event => {
 
   botaoBuscar.disabled = true;
   painelBusca.setAttribute('aria-busy', 'true');
-  consultaStatus.textContent = 'BUSCANDO REGISTRO...';
+  painelBusca.classList.remove('exibindo-resultado');
+  painelBusca.classList.add('consultando');
+
+  consultaStatus.textContent = '';
   resultadoPersonagem.replaceChildren();
+  painelBusca.scrollTop = 0;
 
   try {
-    const resposta = await fetch('/api/conteudo', {
+    // A consulta acontece enquanto a animação está sendo exibida.
+    // O erro é capturado aqui para não gerar rejeição sem tratamento
+    // enquanto aguardamos a animação terminar.
+    const consulta = fetch('/api/conteudo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -508,30 +521,48 @@ formPersonagem.addEventListener('submit', async event => {
         senha: senhaSessao,
         codigo
       })
-    });
+    })
+      .then(async resposta => ({
+        resposta,
+        dados: await resposta.json()
+      }))
+      .catch(erro => ({ erro }));
 
-    const dados = await resposta.json();
+    await animarConsulta(controller.signal);
+
+    // Se a API demorar mais que a animação, continua aguardando.
+    const retorno = await consulta;
 
     if (controller.signal.aborted) return;
 
+    if (retorno.erro) {
+      throw retorno.erro;
+    }
+
+    const { resposta, dados } = retorno;
+
     if (!resposta.ok) {
-      consultaStatus.textContent =
+      mostrarAvisoConsulta(
         resposta.status === 401
           ? 'ACESSO NÃO AUTORIZADO. SAIA E ENTRE NOVAMENTE.'
-          : dados.erro || 'NÃO FOI POSSÍVEL CONSULTAR.';
+          : dados.erro || 'NÃO FOI POSSÍVEL CONSULTAR.'
+      );
 
       return;
     }
 
     mostrarFicha(dados.personagem);
-    consultaStatus.textContent = 'REGISTRO ENCONTRADO.';
   } catch (erro) {
-    if (controller.signal.aborted || erro.name === 'AbortError') {
+    if (
+      controller.signal.aborted ||
+      erro.name === 'AbortError'
+    ) {
       return;
     }
 
-    consultaStatus.textContent =
-      'FALHA NA CONSULTA. TENTE NOVAMENTE.';
+    mostrarAvisoConsulta(
+      'FALHA NA CONSULTA. FECHE ESTA TELA E TENTE NOVAMENTE.'
+    );
   } finally {
     if (buscaController === controller) {
       buscaController = null;
@@ -540,3 +571,140 @@ formPersonagem.addEventListener('submit', async event => {
     }
   }
 });
+
+const animacaoConsulta = document.getElementById('animacao-consulta');
+const terminalInicializacao = document.getElementById('terminal-inicializacao');
+const terminalLinhas = document.getElementById('terminal-linhas');
+const conexaoRemota = document.getElementById('conexao-remota');
+const progressoConsulta = document.getElementById('progresso-consulta');
+
+// Espera que pode ser cancelada ao trocar de tela.
+function esperarConsulta(ms, signal) {
+  return new Promise((resolve, reject) => {
+    function cancelar() {
+      clearTimeout(timer);
+      reject(new DOMException('Consulta cancelada', 'AbortError'));
+    }
+
+    if (signal.aborted) {
+      reject(new DOMException('Consulta cancelada', 'AbortError'));
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', cancelar);
+      resolve();
+    }, ms);
+
+    signal.addEventListener('abort', cancelar, { once: true });
+  });
+}
+
+async function animarConsulta(signal) {
+  animacaoConsulta.hidden = false;
+  terminalInicializacao.hidden = false;
+  conexaoRemota.hidden = true;
+  terminalLinhas.replaceChildren();
+  progressoConsulta.value = 0;
+
+  const linhas = [
+    '> REOLL SYSTEM / REMOTE ACCESS',
+    '> Inicializando terminal...',
+    '> Carregando protocolo de comunicação...',
+    '> Localizando servidor de registros...',
+    '> Terminal pronto. Iniciando conexão.'
+  ];
+
+  // Primeira etapa: entre 1 e 2 segundos.
+  const duracaoTerminal = 1000 + Math.random() * 1000;
+
+  for (const texto of linhas) {
+    const linha = document.createElement('p');
+    linha.textContent = texto;
+    terminalLinhas.appendChild(linha);
+
+    await esperarConsulta(
+      duracaoTerminal / linhas.length,
+      signal
+    );
+  }
+
+  terminalInicializacao.hidden = true;
+  conexaoRemota.hidden = false;
+
+  // Segunda etapa: entre 3 e 4 segundos.
+  const duracaoConexao = 3000 + Math.random() * 1000;
+  const inicio = performance.now();
+
+  let progresso = 0;
+
+  while (true) {
+    const restante =
+      duracaoConexao - 100 - (performance.now() - inicio);
+
+    if (restante <= 0) break;
+
+    await esperarConsulta(
+      Math.min(180 + Math.random() * 170, restante),
+      signal
+    );
+
+    // Incrementos irregulares, sem ultrapassar 95% nesta etapa.
+    progresso = Math.min(
+      95,
+      progresso + (100 - progresso) * (0.1 + Math.random() * 0.15)
+    );
+
+    progressoConsulta.value = Math.floor(progresso);
+  }
+
+  progressoConsulta.value = 100;
+  await esperarConsulta(100, signal);
+}
+
+// Retorna da ficha para o formulário de consulta.
+function voltarConsulta() {
+  fecharBusca();
+
+  areaMensagens.hidden = true;
+  painelBusca.hidden = false;
+
+  arquivoAtual.textContent = 'CONSULTA DE REGISTRO';
+  botaoConsulta.setAttribute('aria-pressed', 'true');
+
+  campoCodigo.focus();
+}
+
+// Mostra uma ficha ou aviso ocupando toda a área de mensagens.
+function abrirResultado(conteudo) {
+  animacaoConsulta.hidden = true;
+  painelBusca.classList.remove('consultando');
+  painelBusca.classList.add('exibindo-resultado');
+
+  const barra = document.createElement('div');
+  barra.className = 'resultado-barra';
+
+  const fechar = document.createElement('button');
+  fechar.type = 'button';
+  fechar.className = 'resultado-fechar';
+  fechar.textContent = '×';
+  fechar.title = 'Voltar à consulta';
+  fechar.setAttribute('aria-label', 'Fechar resultado e voltar à consulta');
+  fechar.addEventListener('click', voltarConsulta);
+
+  barra.appendChild(fechar);
+  resultadoPersonagem.replaceChildren(barra, conteudo);
+
+  fechar.focus();
+}
+
+function mostrarAvisoConsulta(mensagem) {
+  const aviso = document.createElement('article');
+  aviso.className = 'personagem-ficha consulta-aviso';
+
+  const texto = document.createElement('p');
+  texto.textContent = mensagem;
+
+  aviso.appendChild(texto);
+  abrirResultado(aviso);
+}

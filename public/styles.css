@@ -1155,6 +1155,201 @@ body.interferencia-forte::after {
   }
 }
 
+/* Durante a animação e a ficha, ocupa toda a área à direita. */
+.busca-personagem.consultando,
+.busca-personagem.exibindo-resultado {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.busca-personagem.consultando > form,
+.busca-personagem.consultando > #consulta-status,
+.busca-personagem.consultando > #resultado-personagem,
+.busca-personagem.exibindo-resultado > form,
+.busca-personagem.exibindo-resultado > #consulta-status {
+  display: none;
+}
+
+/* Tela preta de inicialização. */
+.animacao-consulta {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background: #000;
+}
+
+.terminal-inicializacao {
+  padding: clamp(18px, 4vw, 32px);
+  color: #c2c8c3;
+  font-size: clamp(16px, 2.5vw, 21px);
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.terminal-titulo {
+  margin-bottom: 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #58615b;
+  color: var(--cor-verde);
+}
+
+#terminal-linhas p {
+  margin: 0 0 10px;
+}
+
+.terminal-cursor {
+  color: var(--cor-verde);
+  animation: cursor-terminal 0.7s steps(1, end) infinite;
+}
+
+@keyframes cursor-terminal {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Tela de conexão com servidor. */
+.conexao-remota {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 24px;
+  text-align: center;
+}
+
+.servidor-icone {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--cor-verde);
+  stroke-width: 2;
+}
+
+.conexao-remota p {
+  margin: 0;
+  color: var(--cor-destaque);
+  font-size: clamp(20px, 3vw, 28px);
+}
+
+.conexao-destino {
+  color: var(--cor-texto-secundario);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+#progresso-consulta {
+  appearance: none;
+  -webkit-appearance: none;
+  width: min(100%, 320px);
+  height: 18px;
+  flex-shrink: 0;
+  border: 1px solid var(--cor-verde);
+  border-radius: 0;
+  background: #111514;
+  color: var(--cor-verde);
+}
+
+#progresso-consulta::-webkit-progress-bar {
+  background: #111514;
+}
+
+#progresso-consulta::-webkit-progress-value {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--cor-verde) 0 8px,
+    #183420 8px 10px
+  );
+}
+
+#progresso-consulta::-moz-progress-bar {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--cor-verde) 0 8px,
+    #183420 8px 10px
+  );
+}
+
+/* Resultado: barra fixa acima da ficha, com o X à direita. */
+.exibindo-resultado > #resultado-personagem {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.resultado-barra {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--cor-borda);
+  background: #111313;
+}
+
+.resultado-fechar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-verde);
+  font: inherit;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.resultado-fechar:hover {
+  background: #202a24;
+}
+
+.resultado-fechar:focus-visible {
+  outline: 2px solid var(--cor-destaque);
+  outline-offset: 2px;
+}
+
+.exibindo-resultado .personagem-ficha {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-verde) #111313;
+}
+
+.consulta-aviso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consulta-aviso p {
+  color: var(--cor-erro);
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+/* Garante que os estados ocultos continuem funcionando. */
+.busca-personagem[hidden],
+.animacao-consulta[hidden],
+.animacao-consulta [hidden] {
+  display: none;
+}
+
 @media(max-width:600px) {
   .topbar {
     height: 72px

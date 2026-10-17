@@ -124,7 +124,27 @@
             </form>
 
             <p id="consulta-status" role="status"></p>
+            <div class="animacao-consulta" id="animacao-consulta" hidden>
+              <div class="terminal-inicializacao" id="terminal-inicializacao">
+                <div class="terminal-titulo">REOLL REMOTE TERMINAL</div>
+                <div id="terminal-linhas" aria-hidden="true"></div>
+                <span class="terminal-cursor" aria-hidden="true">█</span>
+              </div>
 
+              <div class="conexao-remota" id="conexao-remota" hidden>
+                <svg class="servidor-icone" viewBox="0 0 48 48" aria-hidden="true">
+                  <rect x="8" y="5" width="32" height="38" />
+                  <path d="M8 18h32M8 31h32M14 12h5M14 25h5M14 37h5" />
+                </svg>
+
+                <p role="status">ESTABELECENDO CONEXÃO...</p>
+
+                <progress id="progresso-consulta" max="100" value="0" aria-label="Preparando consulta">
+                </progress>
+
+                <span class="conexao-destino">SERVIDOR DE REGISTROS / REOLL</span>
+              </div>
+            </div>
             <div id="resultado-personagem"></div>
           </div>
         </section>
