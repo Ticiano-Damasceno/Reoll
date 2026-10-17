@@ -817,26 +817,24 @@ body.interferencia-forte::after {
 }
 
 @keyframes tremer-fundo {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
+  0%, 100% {
+    background-position: 0 0;
   }
 
   20% {
-    transform: translate(-7px, 2px);
+    background-position: -7px 2px;
   }
 
   40% {
-    transform: translate(6px, -2px);
+    background-position: 6px -2px;
   }
 
   60% {
-    transform: translate(-5px, 1px);
+    background-position: -5px 1px;
   }
 
   80% {
-    transform: translate(8px, -1px);
+    background-position: 8px -1px;
   }
 }
 
@@ -1457,3 +1455,8 @@ main > .panel {
   }
 }
 
+body.interferencia-forte .ornament,
+body.interferencia-forte::after {
+  transform: none;
+  background-repeat: no-repeat;
+}
