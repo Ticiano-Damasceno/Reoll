@@ -6,6 +6,8 @@ const negadoTitulo = document.getElementById('negado-titulo');
 const listaArquivos = document.getElementById('lista-arquivos');
 const arquivoAtual = document.getElementById('arquivo-atual');
 
+let senhaSessao = '';
+let buscaController;
 let tempoMensagem;
 let tempoConexao;
 let tempoAlerta;
@@ -28,6 +30,9 @@ function fecharJanela() {
   definirLateral(false);
   definirTelaCheia(false);
   archive.style.removeProperty('animation');
+
+  senhaSessao = '';
+  fecharBusca();
 
   listaArquivos.replaceChildren();
   arquivoAtual.textContent = 'SELECIONE UM ARQUIVO';
@@ -96,6 +101,8 @@ gate.addEventListener('submit', async event => {
       archive.setAttribute('aria-busy', 'false');
 
       if (resposta.ok) {
+        senhaSessao = senhaDigitada;
+
         mostrarArquivos(dados.arquivos);
         archive.querySelector('.chat-sidebar h2').focus();
         return;
@@ -323,6 +330,9 @@ function mostrarMensagens(mensagens) {
 
 function mostrarArquivos(arquivos) {
   listaArquivos.replaceChildren();
+  fecharBusca();
+
+  // Mantenha o restante desta função.
 
   function selecionarArquivo(arquivo, botaoSelecionado) {
     for (const botao of listaArquivos.children) {
@@ -359,3 +369,174 @@ function mostrarArquivos(arquivos) {
     }
   });
 }
+
+const botaoConsulta = document.getElementById('abrir-consulta');
+const painelBusca = document.getElementById('busca-personagem');
+const formPersonagem = document.getElementById('form-personagem');
+const campoCodigo = document.getElementById('codigo-personagem');
+const consultaStatus = document.getElementById('consulta-status');
+const resultadoPersonagem = document.getElementById('resultado-personagem');
+const botaoBuscar = formPersonagem.querySelector('[type="submit"]');
+const areaMensagens = document.querySelector('.chat-messages');
+
+// Converte o conteúdo digitado ou colado para maiúsculas.
+campoCodigo.addEventListener('input', () => {
+  campoCodigo.value = campoCodigo.value
+    .toUpperCase()
+    .replace(/\s/g, '');
+});
+
+function fecharBusca() {
+  buscaController?.abort();
+  buscaController = null;
+
+  painelBusca.hidden = true;
+  painelBusca.setAttribute('aria-busy', 'false');
+  areaMensagens.hidden = false;
+
+  botaoConsulta.setAttribute('aria-pressed', 'false');
+  botaoBuscar.disabled = false;
+
+  formPersonagem.reset();
+  consultaStatus.textContent = '';
+  resultadoPersonagem.replaceChildren();
+}
+
+botaoConsulta.addEventListener('click', () => {
+  clearTimeout(tempoMensagem);
+  fecharBusca();
+
+  areaMensagens.replaceChildren();
+  areaMensagens.hidden = true;
+  painelBusca.hidden = false;
+
+  arquivoAtual.textContent = 'CONSULTA DE REGISTRO';
+  botaoConsulta.setAttribute('aria-pressed', 'true');
+
+  for (const botao of listaArquivos.children) {
+    botao.classList.remove('ativo');
+    botao.setAttribute('aria-pressed', 'false');
+  }
+
+  campoCodigo.focus();
+});
+
+function mostrarFicha(personagem) {
+  const ficha = document.createElement('article');
+  ficha.className = 'personagem-ficha';
+
+  const imagem = document.createElement('img');
+  imagem.src = personagem.imagem;
+  imagem.alt = `Retrato de ${personagem.nomeArtistico}`;
+  imagem.width = 112;
+  imagem.height = 112;
+
+  const avisoFoto = document.createElement('p');
+  avisoFoto.className = 'personagem-foto-aviso';
+  avisoFoto.textContent = 'RETRATO INDISPONÍVEL';
+  avisoFoto.hidden = true;
+
+  imagem.addEventListener('error', () => {
+    imagem.hidden = true;
+    avisoFoto.hidden = false;
+  });
+
+  const titulo = document.createElement('h3');
+  titulo.textContent = personagem.nomeArtistico;
+
+  const dados = document.createElement('dl');
+  dados.className = 'personagem-dados';
+
+  const campos = [
+    ['Nome completo', personagem.nome],
+    ['Código', personagem.codigo],
+    ['Nível', personagem.nivel],
+    ['Altura', personagem.altura],
+    ['Idade', personagem.idade],
+    ['Elemento', personagem.elemento],
+    ['DNA usado', personagem.dnaUsado]
+  ];
+
+  for (const [rotulo, valor] of campos) {
+    const linha = document.createElement('div');
+
+    const termo = document.createElement('dt');
+    termo.textContent = rotulo;
+
+    const descricao = document.createElement('dd');
+    descricao.textContent = valor;
+
+    linha.append(termo, descricao);
+    dados.appendChild(linha);
+  }
+
+  ficha.append(imagem, avisoFoto, titulo, dados);
+  resultadoPersonagem.replaceChildren(ficha);
+}
+
+formPersonagem.addEventListener('submit', async event => {
+  event.preventDefault();
+
+  if (botaoBuscar.disabled) return;
+
+  const codigo = campoCodigo.value.trim().toUpperCase();
+
+  if (!/^[A-Z0-9_-]{1,40}$/.test(codigo)) {
+    consultaStatus.textContent = 'CÓDIGO INVÁLIDO.';
+    return;
+  }
+
+  buscaController?.abort();
+
+  const controller = new AbortController();
+  buscaController = controller;
+
+  botaoBuscar.disabled = true;
+  painelBusca.setAttribute('aria-busy', 'true');
+  consultaStatus.textContent = 'BUSCANDO REGISTRO...';
+  resultadoPersonagem.replaceChildren();
+
+  try {
+    const resposta = await fetch('/api/conteudo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify({
+        senha: senhaSessao,
+        codigo
+      })
+    });
+
+    const dados = await resposta.json();
+
+    if (controller.signal.aborted) return;
+
+    if (!resposta.ok) {
+      consultaStatus.textContent =
+        resposta.status === 401
+          ? 'ACESSO NÃO AUTORIZADO. SAIA E ENTRE NOVAMENTE.'
+          : dados.erro || 'NÃO FOI POSSÍVEL CONSULTAR.';
+
+      return;
+    }
+
+    mostrarFicha(dados.personagem);
+    consultaStatus.textContent = 'REGISTRO ENCONTRADO.';
+  } catch (erro) {
+    if (controller.signal.aborted || erro.name === 'AbortError') {
+      return;
+    }
+
+    consultaStatus.textContent =
+      'FALHA NA CONSULTA. TENTE NOVAMENTE.';
+  } finally {
+    if (buscaController === controller) {
+      buscaController = null;
+      botaoBuscar.disabled = false;
+      painelBusca.setAttribute('aria-busy', 'false');
+    }
+  }
+});

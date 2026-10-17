@@ -78,6 +78,11 @@
             «
           </button>
           <span class="chat-label">ACESSO AUTORIZADO</span>
+
+          <button class="consulta-toggle" id="abrir-consulta" type="button" aria-pressed="false">
+            BUSCAR DNA
+          </button>
+
           <h2 tabindex="-1">ARQUIVOS</h2>
 
           <nav class="chat-arquivos" id="lista-arquivos" aria-label="Selecionar arquivo">
@@ -101,6 +106,27 @@
           </header>
 
           <div class="chat-messages"></div>
+          <div class="busca-personagem" id="busca-personagem" hidden>
+            <form id="form-personagem">
+              <label for="codigo-personagem">
+                CÓDIGO DO REGISTRO
+              </label>
+
+              <div class="consulta-campos">
+                <input class="field" id="codigo-personagem" type="text" placeholder="DIGITE O CÓDIGO" maxlength="40"
+                  pattern="[A-Z0-9_-]+" title="Use letras, números, hífen ou sublinhado." autocomplete="off"
+                  autocapitalize="characters" spellcheck="false" aria-describedby="consulta-status" required>
+
+                <button class="consulta-enviar" type="submit">
+                  BUSCAR
+                </button>
+              </div>
+            </form>
+
+            <p id="consulta-status" role="status"></p>
+
+            <div id="resultado-personagem"></div>
+          </div>
         </section>
 
       </article>
