@@ -39,17 +39,25 @@ export default function handler(req, res) {
   ) {
     return res.status(401).json({ erro: 'Acesso negado.' });
   }
-
   try {
     const dados = JSON.parse(conteudo);
 
+    if (
+      dados === null ||
+      typeof dados !== 'object' ||
+      Array.isArray(dados)
+    ) {
+      throw new Error('Conteúdo inválido');
+    }
+
+    // Converte para o formato que o chat já utiliza.
+    const arquivos = Object.entries(dados).map(
+      ([nome, mensagens]) => ({ nome, mensagens })
+    );
+
     const valido =
-      dados !== null &&
-      Array.isArray(dados.arquivos) &&
-      dados.arquivos.length > 0 &&
-      dados.arquivos.every(arquivo =>
-        arquivo !== null &&
-        typeof arquivo.nome === 'string' &&
+      arquivos.length > 0 &&
+      arquivos.every(arquivo =>
         arquivo.nome.trim().length > 0 &&
         Array.isArray(arquivo.mensagens) &&
         arquivo.mensagens.every(mensagem =>
@@ -63,9 +71,7 @@ export default function handler(req, res) {
       throw new Error('Conteúdo inválido');
     }
 
-    return res.status(200).json({
-      arquivos: dados.arquivos
-    });
+    return res.status(200).json({ arquivos });
   } catch {
     return res.status(500).json({
       erro: 'Serviço indisponível.'
