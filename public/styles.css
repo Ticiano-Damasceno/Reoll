@@ -930,6 +930,77 @@ body.interferencia-forte::after {
   display: block;
 }
 
+.chat-sidebar {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-arquivos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 20px 0;
+  padding: 2px;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--cor-verde) #111313;
+}
+
+.arquivo-item {
+  flex-shrink: 0;
+  width: 100%;
+  padding: 10px 8px;
+
+  border: 1px solid transparent;
+  border-left: 2px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+
+  font: inherit;
+  font-size: 20px;
+  line-height: 1.2;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.arquivo-item:hover {
+  background: #202a24;
+  color: var(--cor-texto);
+}
+
+.arquivo-item.ativo {
+  border-color: var(--cor-verde);
+  background: #8fd6a312;
+  color: var(--cor-verde);
+}
+
+.arquivo-item:focus-visible {
+  outline: 2px solid var(--cor-destaque);
+  outline-offset: -2px;
+}
+
+.chat-sidebar > .sidebar-toggle,
+.chat-sidebar > .back {
+  flex-shrink: 0;
+}
+
+#arquivo-atual {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .arquivo-item {
+    padding: 8px 5px;
+    font-size: 17px;
+  }
+}
+
 @media(max-width:600px) {
   .topbar {
     height: 72px
@@ -967,3 +1038,4 @@ body.interferencia-forte::after {
     }
   }
 }
+

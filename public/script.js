@@ -3,6 +3,8 @@ const password = document.getElementById('password');
 const statusMessage = document.getElementById('status');
 const archive = document.getElementById('archive');
 const negadoTitulo = document.getElementById('negado-titulo');
+const listaArquivos = document.getElementById('lista-arquivos');
+const arquivoAtual = document.getElementById('arquivo-atual');
 
 let tempoMensagem;
 let tempoConexao;
@@ -27,15 +29,18 @@ function fecharJanela() {
   definirTelaCheia(false);
   archive.style.removeProperty('animation');
 
+  listaArquivos.replaceChildren();
+  arquivoAtual.textContent = 'SELECIONE UM ARQUIVO';
+
   statusMessage.hidden = true;
   password.value = '';
   password.focus();
+
 }
 
 gate.addEventListener('submit', async event => {
   event.preventDefault();
 
-  // Evita iniciar outra solicitação enquanto a janela está aberta.
   if (document.body.classList.contains('unlocked')) return;
 
   limparTemporizadores();
@@ -47,6 +52,8 @@ gate.addEventListener('submit', async event => {
   statusMessage.hidden = true;
 
   document.querySelector('.chat-messages').replaceChildren();
+  listaArquivos.replaceChildren();
+  arquivoAtual.textContent = 'SELECIONE UM ARQUIVO';
 
   archive.classList.remove('negado');
   archive.classList.add('conectando');
@@ -71,15 +78,25 @@ gate.addEventListener('submit', async event => {
 
     const dados = resposta.ok ? await resposta.json() : null;
 
-    // Mantém a animação de conexão por pelo menos 2,8 segundos.
-    const espera = Math.max(0, 2800 - (performance.now() - inicio));
+    if (
+      resposta.ok &&
+      (!dados || !Array.isArray(dados.arquivos) ||
+        dados.arquivos.length === 0)
+    ) {
+      throw new Error('Lista de arquivos inválida');
+    }
+
+    const espera = Math.max(
+      0,
+      2800 - (performance.now() - inicio)
+    );
 
     tempoConexao = setTimeout(() => {
       archive.classList.remove('conectando');
       archive.setAttribute('aria-busy', 'false');
 
       if (resposta.ok) {
-        mostrarMensagens(dados.mensagens);
+        mostrarArquivos(dados.arquivos);
         archive.querySelector('.chat-sidebar h2').focus();
         return;
       }
@@ -133,7 +150,6 @@ function desenharRuido(canvas) {
 
   ctx.clearRect(0, 0, largura, altura);
 
-  // Distribui pequenos riscos por toda a largura.
   for (let x = 0; x < largura;) {
     const comprimento = 4 + Math.floor(Math.random() * 35);
     const y = Math.floor(Math.random() * altura);
@@ -148,7 +164,6 @@ function desenharRuido(canvas) {
       Math.random() < 0.8 ? 1 : 2
     );
 
-    // Espaços irregulares entre os riscos.
     x += comprimento + 3 + Math.floor(Math.random() * 16);
   }
 
@@ -161,7 +176,6 @@ function criarInterferencia() {
   if (!document.hidden) {
     const quantidade = 2 + Math.floor(Math.random() * 2);
 
-    // Cerca de 35% das interferências também fazem o fundo tremer.
     const tremerFundo = Math.random() < 0.85;
 
     if (tremerFundo) {
@@ -177,7 +191,6 @@ function criarInterferencia() {
       }, duracao);
     }
 
-    // 35% das vezes: faixas que atravessam a tela.
     const faixaCompleta = Math.random() < 0.35;
 
     for (let i = 0; i < quantidade; i++) {
@@ -209,7 +222,6 @@ function criarInterferencia() {
       ruidosFundo.appendChild(ruido);
       desenharRuido(ruido);
 
-      // Distribui os chiados em regiões diferentes da tela.
       const alturaRegiao = alturaTela / quantidade;
       const posicao = alturaRegiao * (i + 0.2 + Math.random() * 0.6);
 
@@ -218,7 +230,6 @@ function criarInterferencia() {
         Math.min(posicao, alturaTela - altura)
       )}px`;
 
-      // A textura muda durante toda a interferência.
       const atualizarTextura = setInterval(() => {
         desenharRuido(ruido);
       }, 90);
@@ -230,7 +241,6 @@ function criarInterferencia() {
     }
   }
 
-  // Após terminar, espera entre 1 e 5 segundos.
   setTimeout(
     criarInterferencia,
     duracao + 1000 + Math.random() * 4000
@@ -276,7 +286,6 @@ function mostrarMensagens(mensagens) {
   function agendarMensagem() {
     if (indice >= mensagens.length) return;
 
-    // Intervalo aleatório entre 200 e 600 milissegundos.
     const intervalo = 200 + Math.random() * 400;
 
     tempoMensagem = setTimeout(() => {
@@ -284,7 +293,6 @@ function mostrarMensagens(mensagens) {
 
       const mensagem = mensagens[indice];
 
-      // Só acompanha a mensagem se o usuário estiver perto do fim.
       const acompanhar =
         area.scrollHeight - area.scrollTop - area.clientHeight < 60;
 
@@ -311,4 +319,43 @@ function mostrarMensagens(mensagens) {
   }
 
   agendarMensagem();
+}
+
+function mostrarArquivos(arquivos) {
+  listaArquivos.replaceChildren();
+
+  function selecionarArquivo(arquivo, botaoSelecionado) {
+    for (const botao of listaArquivos.children) {
+      const selecionado = botao === botaoSelecionado;
+
+      botao.classList.toggle('ativo', selecionado);
+      botao.setAttribute('aria-pressed', String(selecionado));
+    }
+
+    arquivoAtual.textContent = arquivo.nome;
+
+    mostrarMensagens(arquivo.mensagens);
+  }
+
+  arquivos.forEach((arquivo, indice) => {
+    const botao = document.createElement('button');
+
+    botao.type = 'button';
+    botao.className = 'arquivo-item';
+    botao.textContent = arquivo.nome;
+    botao.title = arquivo.nome;
+    botao.setAttribute('aria-pressed', 'false');
+
+    botao.addEventListener('click', () => {
+      if (botao.classList.contains('ativo')) return;
+
+      selecionarArquivo(arquivo, botao);
+    });
+
+    listaArquivos.appendChild(botao);
+
+    if (indice === 0) {
+      selecionarArquivo(arquivo, botao);
+    }
+  });
 }
